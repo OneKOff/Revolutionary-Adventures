@@ -1,18 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
-public class CameraController : MonoBehaviour
+namespace Camera
 {
-    // Start is called before the first frame update
-    void Start()
+    [RequireComponent(typeof(Rigidbody))]
+    public class CameraController : MonoBehaviour
     {
+        [SerializeField] private Transform target;
         
+        [Header("Speed")]
+        [SerializeField] private float minSpeed;
+        [SerializeField] private float maxSpeed;
+        [SerializeField] private float rangeForMaxSpeed;
+        
+        private Rigidbody _rb;
+        
+        private void Awake()
+        {
+            Init();
+        }
+    
+        private void Init()
+        {
+            TryGetComponent(out _rb);
+        }
+    
+        private void Update()
+        {
+            var targetPos = target.position;
+            var cameraPos = transform.position;
+            var sqrRange = (targetPos - cameraPos).sqrMagnitude;
+            
+            _rb.velocity = (targetPos - cameraPos).normalized * 
+                           Mathf.Lerp(minSpeed, maxSpeed, sqrRange / rangeForMaxSpeed * rangeForMaxSpeed);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
